@@ -1,0 +1,8 @@
+ChineseFoodNet/*
+checkpoint/*
+fakes/*
+test/*
+logs/*
+sample/*
+__pycache__/
+*/__pycache/
