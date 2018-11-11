@@ -6,3 +6,4 @@ logs/*
 sample/*
 __pycache__/
 */__pycache/
+.DS_Store
