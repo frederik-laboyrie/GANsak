@@ -3,7 +3,6 @@ import tensorflow as tf
 from ops import *
 from utils import *
 
-RESIZE = True
 
 def discriminator(image, options, reuse=False, name="discriminator"):
 
@@ -27,7 +26,7 @@ def discriminator(image, options, reuse=False, name="discriminator"):
         return h4
 
 
-def generator_unet(image, options, reuse=False, name="generator", resize=RESIZE):
+def generator_unet(image, options, reuse=False, name="generator"):
 
     dropout_rate = 0.5 if options.is_training else 1.0
     with tf.variable_scope(name):
@@ -54,6 +53,8 @@ def generator_unet(image, options, reuse=False, name="generator", resize=RESIZE)
         # e7 is (2 x 2 x self.gf_dim*8)
         e8 = instance_norm(conv2d(lrelu(e7), options.gf_dim*8, name='g_e8_conv'), 'g_bn_e8')
         # e8 is (1 x 1 x self.gf_dim*8)
+
+        resize = options.resize_convolutions
 
         d1 = resizeconv2d(tf.nn.relu(e8), int(e7.shape[1]), options.gf_dim*8*2, name='resize_1') if resize else \
             deconv2d(tf.nn.relu(e8), options.gf_dim*8, name='g_d1')
@@ -100,7 +101,7 @@ def generator_unet(image, options, reuse=False, name="generator", resize=RESIZE)
         return tf.nn.tanh(d8)
 
 
-def generator_resnet(image, options, reuse=False, name="generator", resize=RESIZE):
+def generator_resnet(image, options, reuse=False, name="generator"):
 
     with tf.variable_scope(name):
         # image is 256 x 256 x input_c_dim
@@ -135,7 +136,7 @@ def generator_resnet(image, options, reuse=False, name="generator", resize=RESIZ
         r8 = residule_block(r7, options.gf_dim*4, name='g_r8')
         r9 = residule_block(r8, options.gf_dim*4, name='g_r9')
 
-        if resize:
+        if options.resize_convolutions:
             d1 = resizeconv2d(r9, options.gf_dim*2,  int(r9.shape[3]) / 2, name='resize_1')
             d1 = tf.nn.relu(instance_norm(d1, 'g_d1_bn'))
             d2 = resizeconv2d(d1, options.image_size, int(d1.shape[3]) / 2, name='resize_2')

@@ -42,7 +42,7 @@ class CycleGAN(object):
                               gf_dim df_dim output_c_dim is_training')
         self.options = OPTIONS._make((args.batch_size, args.fine_size,
                                       args.ngf, args.ndf, args.output_nc,
-                                      args.phase == 'train'))
+                                      args.phase == 'train', args.resize_convolutions))
 
         self._build_model()
         self.saver = tf.train.Saver()
